@@ -1,0 +1,40 @@
+/*
+    Código para acionamento de RELÉ através do sensor de movimento PIR.
+    
+*/
+
+int inputPinPir = 7;            // Escolhe o pino de entrada para o sensor PIR.
+int RELE_PIN_OUT = 6;           // Pino de saida para o relé. Este pino tem saída normalmente 5v.
+
+int pirState = LOW;             // Inicia o PIR, assumindo que não há movimento detectado.
+int valorPir = 0;               // Variável que lê o estado de PIR depois de atualizado.
+
+void setup() {
+  pinMode(RELE_PIN_OUT, OUTPUT);  // Declara que o pino 6 é de saída.
+  pinMode(inputPinPir, INPUT);    // Declara que o pino 7 é de entrada.
+  Serial.begin(9600);             // Declara a velocidade de comunicação da porta serial como 9600.
+}
+
+void loop(){
+  valorPir = digitalRead(inputPinPir);    // Armazena o valor de entrada PIR no pino 7 na variável "valorPir".
+  if (valorPir == HIGH) {                 // Se valor PIR for 5v. Será quando o PIR detectar movimento.
+    digitalWrite(RELE_PIN_OUT, LOW);      // O pino 6 enviará 0v para o relé, fazendo com que este acione.
+    delay(15000);                         // Irá aguardar 15 segundos acionado.
+    
+    if (pirState == LOW) {                // PIR state tem valor LOW por default.
+    Serial.println("Motion detected!");   // Exibe mensagem no monitor serial.
+    pirState = HIGH;                      // Altera o valor de pirState para HIGH.
+    }
+  } 
+  
+  else {                                  // Senão.
+      digitalWrite(RELE_PIN_OUT, HIGH);   // Envia 5v para o relé, mantendo o mesmo desligado.
+      delay(300);                         // Aguarda 0,3 segundos.
+      if (pirState == HIGH){              // Se o sensor tiver detectado movimento o valor será HIGH senão será LOW.
+      Serial.println("Motion ended!");    // Envia msg para serial monitor.
+      pirState = LOW;                     // Altera valor do pirState para LOW. E repete o loop.
+    }
+  }
+}
+
+
